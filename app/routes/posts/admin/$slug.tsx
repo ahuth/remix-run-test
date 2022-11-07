@@ -1,7 +1,7 @@
 import { json, redirect, type ActionFunction, type LoaderFunction } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useTransition } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import { getPost, updatePost, type Post } from "~/models/post.server";
+import { deletePost, getPost, updatePost, type Post } from "~/models/post.server";
 
 const inputClassName = `w-full rounded border border-gray-500 px-2 py-1 text-lg`;
 
@@ -26,6 +26,13 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
+
+  if (formData.get("intent") === "delete") {
+    const slug = formData.get("slug");
+    invariant(typeof slug === "string", "slug must be a string");
+    await deletePost({ slug });
+    return redirect("/posts/admin");
+  }
 
   const title = formData.get("title");
   const slug = formData.get("slug");
@@ -65,7 +72,19 @@ export default function NewPost() {
   const isUpdating = Boolean(transition.submission);
 
   return (
-    <Form method="put">
+    <Form method="post">
+      <p className="text-right">
+        <input type="hidden" name="slug" value={post.slug} />
+        <button
+          name="intent"
+          value="delete"
+          type="submit"
+          className="rounded bg-red-500 py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400 disabled:bg-red-300"
+          disabled={isUpdating}
+        >
+          {isUpdating ? "Deleting..." : "Delete Post"}
+        </button>
+      </p>
       <p>
         <label>
           Post Title:{" "}
@@ -119,6 +138,8 @@ export default function NewPost() {
       </p>
       <p className="text-right">
         <button
+          name="intent"
+          value="update"
           type="submit"
           className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
           disabled={isUpdating}
