@@ -65,7 +65,7 @@ export default function NewPost() {
   const { post } = useLoaderData<LoaderData>();
   const errors = useActionData();
   const transition = useTransition();
-  const isUpdating = Boolean(transition.submission);
+  const isTransitioning = Boolean(transition.submission);
 
   return (
     <Form method="post">
@@ -76,9 +76,9 @@ export default function NewPost() {
           value="delete"
           type="submit"
           className="rounded bg-red-500 py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400 disabled:bg-red-300"
-          disabled={isUpdating}
+          disabled={isTransitioning}
         >
-          {isUpdating ? "Deleting..." : "Delete Post"}
+          {isTransitioning ? "Deleting..." : "Delete Post"}
         </button>
       </p>
       <p>
@@ -138,9 +138,9 @@ export default function NewPost() {
           value="update"
           type="submit"
           className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
-          disabled={isUpdating}
+          disabled={isTransitioning}
         >
-          {isUpdating ? "Updating..." : "Update Post"}
+          {isTransitioning ? "Updating..." : "Update Post"}
         </button>
       </p>
     </Form>
