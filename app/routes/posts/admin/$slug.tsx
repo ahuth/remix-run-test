@@ -56,10 +56,6 @@ export const action: ActionFunction = async ({ request }) => {
   invariant(typeof slug === "string", "slug must be a string");
   invariant(typeof markdown === "string", "markdown must be a string");
 
-  // TODO: remove me
-  // For testing purposes.
-  await new Promise((res) => setTimeout(res, 1000));
-
   await updatePost({ title, slug, markdown });
 
   return redirect(`/posts/admin/${slug}`);
