@@ -1,5 +1,5 @@
 import { json, redirect, type ActionFunction } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useTransition } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { createPost } from "~/models/post.server";
 
@@ -38,6 +38,10 @@ export const action: ActionFunction = async ({ request }) => {
   invariant(typeof slug === "string", "slug must be a string");
   invariant(typeof markdown === "string", "markdown must be a string");
 
+  // TODO: remove me
+  // For testing purposes.
+  await new Promise((res) => setTimeout(res, 1000));
+
   await createPost({ title, slug, markdown });
 
   return redirect("/posts/admin");
@@ -45,6 +49,8 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function NewPost() {
   const errors = useActionData();
+  const transition = useTransition();
+  const isCreating = Boolean(transition.submission);
 
   return (
     <Form method="post">
@@ -91,8 +97,9 @@ export default function NewPost() {
         <button
           type="submit"
           className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+          disabled={isCreating}
         >
-          Create Post
+          {isCreating ? "Creating..." : "Create Post"}
         </button>
       </p>
     </Form>
